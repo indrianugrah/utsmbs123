@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi Akhlak Tasawuf - Sri Anugrah Indriani, S.Pd., M.Pd.</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        galaxy: {
+                            900: '#0B0D1B',
+                            800: '#12162D',
+                            700: '#1C2348',
+                            600: '#2A3467',
+                            accent: '#6366F1',
+                            neon: '#38BDF8',
+                            gold: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080A15;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: #F3F4F6;
+        }
+
+        /* Background Animated Stars Effect */
+        .stars-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0D1B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A3467;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366F1;
+        }
+
+        .glass-card {
+            background: rgba(18, 22, 45, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-alert {
+            background: rgba(220, 38, 38, 0.2);
+            backdrop-filter: blur(16px);
+            border: 2px solid #EF4444;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        @keyframes siren-flash {
+            0%, 100% { background-color: rgba(220, 38, 38, 0.15); }
+            50% { background-color: rgba(30, 58, 138, 0.3); }
+        }
+
+        .siren-active {
+            animation: siren-flash 0.5s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between overflow-x-hidden select-none">
+
+    <!-- Starry Background Elements -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Alarm Overlay Warning for Violation -->
+    <div id="violationOverlay" class="fixed inset-0 bg-red-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card-alert max-w-lg w-full p-8 rounded-2xl text-center space-y-6">
+            <div class="w-20 h-20 bg-red-600/30 rounded-full flex items-center justify-center mx-auto text-red-500 text-4xl animate-bounce">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-red-400 uppercase tracking-wider mb-2">Peringatan Kecurangan!</h2>
+                <p class="text-gray-200 text-sm leading-relaxed">
+                    Anda terdeteksi **meninggalkan halaman ujian / membuka tab lain**. Tindakan ini telah dicatat oleh sistem dan dilaporkan ke dosen pengampu!
+                </p>
+            </div>
+            <div class="bg-red-950/60 p-4 rounded-xl border border-red-500/30">
+                <p class="text-xs text-red-300 font-semibold">
+                    Jumlah Pelanggaran: <span id="violationCountDisplay" class="text-xl font-extrabold text-white">0</span> Kali
+                </p>
+            </div>
+            <button onclick="dismissViolationWarning()" class="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition duration-200 shadow-lg">
+                <i class="fa-solid fa-rotate-left mr-2"></i> Saya Mengerti & Kembali Mengerjakan
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Navigation / Header Bar -->
+    <header class="relative z-10 border-b border-indigo-900/50 glass-card sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-400 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-kaaba"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-200 to-purple-300">
+                        E-EVALUASI AKHLAK TASAWUF
+                    </h1>
+                    <p class="text-xs text-indigo-300 flex items-center gap-1">
+                        <span>Dosen: Sri Anugrah Indriani, S.Pd., M.Pd.</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Timer Widget (Visible during Exam) -->
+            <div id="headerTimer" class="hidden items-center gap-3 bg-galaxy-900/90 border border-sky-500/30 px-4 py-2 rounded-xl text-sky-400 font-mono font-bold shadow-inner">
+                <i class="fa-regular fa-clock animate-pulse text-lg"></i>
+                <span id="timerDisplay" class="text-lg tracking-widest">01:20:00</span>
+            </div>
+
+            <!-- Dosen Portal Login Button -->
+            <div>
+                <button onclick="openDosenLoginModal()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-galaxy-800 hover:bg-galaxy-700 text-indigo-200 border border-indigo-500/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-sky-400"></i>
+                    <span>Portal Dosen</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="relative z-10 max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- STAGE 1: REGISTRATION & WEBCAM CAPTURE FORM -->
+        <section id="registrationSection" class="glass-card rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8 border border-indigo-500/20">
+            <div class="text-center space-y-2 border-b border-gray-800 pb-6">
+                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-xs rounded-full font-semibold border border-indigo-500/30 uppercase tracking-widest">
+                    Ujian Akhlak Tasawuf • Semester 1
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white pt-2">Formulir Identitas Mahasiswa</h2>
+                <p class="text-sm text-gray-400 max-w-md mx-auto">
+                    Silakan isi data diri dengan jujur dan izinkan akses kamera untuk melakukan verifikasi pengawasan sebelum memulai evaluasi.
+                </p>
+            </div>
+
+            <form id="identityForm" onsubmit="handleStartExam(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    
+                    <!-- Left: Personal Data Inputs -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-indigo-200 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-user mr-1 text-sky-400"></i> Nama Lengkap
+                            </label>
+                            <input type="text" id="inputNama" required placeholder="Contoh: Muhammad Rizky" 
+                                class="w-full bg-galaxy-900/80 border border-galaxy-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-indigo-200 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-id-card mr-1 text-sky-400"></i> NIM (Nomor Induk Mahasiswa)
+                            </label>
+                            <input type="text" id="inputNIM" required placeholder="Contoh: 2301015001" 
+                                class="w-full bg-galaxy-900/80 border border-galaxy-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-indigo-200 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-graduation-cap mr-1 text-sky-400"></i> Program Studi
+                            </label>
+                            <input type="text" id="inputProdi" required placeholder="Contoh: Pendidikan Agama Islam" 
+                                class="w-full bg-galaxy-900/80 border border-galaxy-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition text-sm">
+                        </div>
+
+                        <div class="p-4 bg-indigo-950/40 rounded-xl border border-indigo-800/40 text-xs text-indigo-300 space-y-1.5">
+                            <p class="font-semibold text-sky-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info"></i> Tata Tertib Ujian:
+                            </p>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                                <li>Waktu pengerjaan adalah **1 Jam 20 Menit**.</li>
+                                <li>Dilarang berpindah tab/jendela layar selama ujian.</li>
+                                <li>Kamera akan mengambil foto saat Anda menekan tombol mulai.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right: Camera Live Preview & Snapshot -->
+                    <div class="flex flex-col items-center justify-center space-y-3 bg-galaxy-900/50 p-4 rounded-2xl border border-galaxy-700">
+                        <label class="block text-xs font-medium text-indigo-200 uppercase tracking-wider self-start">
+                            <i class="fa-solid fa-camera mr-1 text-sky-400"></i> Verifikasi Wajah (Webcam)
+                        </label>
+                        
+                        <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-indigo-500/30 flex items-center justify-center">
+                            <video id="webcamVideo" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
+                            <canvas id="snapshotCanvas" class="hidden w-full h-full object-cover"></canvas>
+                            
+                            <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-galaxy-900 p-4 text-center">
+                                <i class="fa-solid fa-video-slash text-3xl mb-2 text-indigo-400"></i>
+                                <span class="text-xs">Klik "Izinkan Kamera" di bawah untuk mengaktifkan video</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 w-full">
+                            <button type="button" id="btnStartCamera" onclick="initCamera()" class="flex-1 py-2 bg-galaxy-700 hover:bg-galaxy-600 text-sky-300 text-xs rounded-xl font-medium border border-sky-500/30 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-video"></i> Aktifkan Kamera
+                            </button>
+                            <button type="button" id="btnCapture" onclick="takeSnapshot()" disabled class="px-4 py-2 bg-indigo-600 opacity-50 cursor-not-allowed text-white text-xs rounded-xl font-medium transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-shutter-button"></i> Ambil Foto
+                            </button>
+                        </div>
+                        <p id="cameraStatusText" class="text-[11px] text-amber-400 font-medium">*Wajib mengambil foto wajah sebelum memulai.</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-800">
+                    <button type="submit" id="btnStartExam" disabled class="w-full py-4 bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:from-sky-400 hover:to-purple-500 opacity-50 cursor-not-allowed text-white font-extrabold text-base rounded-2xl shadow-xl transition transform active:scale-[0.99] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Mulai Kerjakan Evaluasi Sekarang</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- STAGE 2: QUESTIONNAIRE & EXAM SECTION -->
+        <section id="examSection" class="hidden space-y-8">
+            
+            <!-- Student Header Banner -->
+            <div class="glass-card rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 border border-indigo-500/30">
+                <div class="flex items-center gap-4">
+                    <img id="examStudentPhoto" src="" alt="Foto Mahasiswa" class="w-14 h-14 rounded-full object-cover border-2 border-sky-400 shadow-md">
+                    <div>
+                        <h3 id="examStudentName" class="font-bold text-lg text-white">Nama Mahasiswa</h3>
+                        <p class="text-xs text-indigo-300">
+                            NIM: <span id="examStudentNIM" class="font-mono text-sky-300"></span> | 
+                            Prodi: <span id="examStudentProdi" class="text-sky-300"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-red-950/40 border border-red-500/30 px-3.5 py-1.5 rounded-xl text-xs text-red-300">
+                    <i class="fa-solid fa-shield-cat text-red-400 animate-pulse"></i>
+                    <span>Sistem Pengawasan Aktif</span>
+                </div>
+            </div>
+
+            <!-- Exam Questions Form -->
+            <form id="examForm" onsubmit="handleFinishExam(event)" class="space-y-6">
+                
+                <!-- Question 1 -->
+                <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-sm border border-sky-500/30">1</span>
+                        <label class="text-sm sm:text-base font-semibold text-gray-100 leading-relaxed pt-1">
+                            Jelaskan definisi AKHLAK, TASAWUF, dan AKHLAK TASAWUF!
+                        </label>
+                    </div>
+                    <textarea id="q1" required rows="4" placeholder="Tuliskan penjelasan Anda di sini..."
+                        class="w-full bg-galaxy-900/90 border border-galaxy-600 rounded-xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-sm border border-sky-500/30">2</span>
+                        <label class="text-sm sm:text-base font-semibold text-gray-100 leading-relaxed pt-1">
+                            Jelaskan 3 proses tazkiyatun nafs!
+                        </label>
+                    </div>
+                    <textarea id="q2" required rows="4" placeholder="Tuliskan 3 tahapan tazkiyatun nafs beserta penjelasannya..."
+                        class="w-full bg-galaxy-900/90 border border-galaxy-600 rounded-xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-sm border border-sky-500/30">3</span>
+                        <label class="text-sm sm:text-base font-semibold text-gray-100 leading-relaxed pt-1">
+                            Jelaskan secara singkat pertumbuhan akhlak tasawuf pada masa Rasulullah SAW!
+                        </label>
+                    </div>
+                    <textarea id="q3" required rows="4" placeholder="Tuliskan gambaran historis singkat pada masa Rasulullah SAW..."
+                        class="w-full bg-galaxy-900/90 border border-galaxy-600 rounded-xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-sm border border-sky-500/30">4</span>
+                        <label class="text-sm sm:text-base font-semibold text-gray-100 leading-relaxed pt-1">
+                            Jelaskan relevansi akhlak tasawuf di era modern bagi Gen Z!
+                        </label>
+                    </div>
+                    <textarea id="q4" required rows="4" placeholder="Berikan analisis relevansi bagi tantangan generasi Z saat ini..."
+                        class="w-full bg-galaxy-900/90 border border-galaxy-600 rounded-xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="glass-card rounded-2xl p-6 border border-indigo-500/20 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-sm border border-sky-500/30">5</span>
+                        <label class="text-sm sm:text-base font-semibold text-gray-100 leading-relaxed pt-1">
+                            Jelaskan salah satu hubungan Akhlak Tasawuf dengan ilmu keislaman!
+                        </label>
+                    </div>
+                    <textarea id="q5" required rows="4" placeholder="Pilih salah satu disiplin ilmu keislaman (misal: Fiqih, Tauhid/Kalam) dan jelaskan keterkaitannya..."
+                        class="w-full bg-galaxy-900/90 border border-galaxy-600 rounded-xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-lg rounded-2xl shadow-xl transition transform active:scale-[0.99] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-double"></i>
+                        <span>Kirim Jawaban Evaluasi</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- STAGE 3: THANK YOU & FEEDBACK SECTION -->
+        <section id="thankyouSection" class="hidden glass-card rounded-3xl p-8 sm:p-12 text-center space-y-8 border border-emerald-500/30 animate-fade-in">
+            <div class="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-5xl border border-emerald-500/40 shadow-xl shadow-emerald-900/30">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div class="space-y-3">
+                <h2 class="text-3xl font-extrabold text-white">Terima Kasih Banyak!</h2>
+                <p class="text-gray-300 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                    Jawaban evaluasi Anda telah berhasil dikirim dan tersimpan dengan aman di database pengawasan. Semoga ilmu yang dipelajari membawa keberkahan dan membentuk akhlakul karimah.
+                </p>
+                <p class="text-xs text-indigo-300 font-medium"> Salam hangat, **Sri Anugrah Indriani, S.Pd., M.Pd.**</p>
+            </div>
+
+            <!-- Feedback / Review Form -->
+            <div id="feedbackBox" class="bg-galaxy-900/80 p-6 rounded-2xl border border-galaxy-700 max-w-xl mx-auto text-left space-y-4">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-comment-dots text-sky-400"></i>
+                    Ulasan & Kesan Evaluasi Hari Ini
+                </h3>
+                <p class="text-xs text-gray-400">Berikan tanggapan Anda mengenai pelaksanaan evaluasi web berbasis galaksi hari ini:</p>
+                
+                <div>
+                    <label class="block text-xs text-indigo-200 mb-1">Rating Pengalaman:</label>
+                    <div class="flex gap-3 text-amber-400 text-2xl" id="starRatingContainer">
+                        <i class="fa-solid fa-star cursor-pointer hover:scale-125 transition" onclick="setRating(1)"></i>
+                        <i class="fa-solid fa-star cursor-pointer hover:scale-125 transition" onclick="setRating(2)"></i>
+                        <i class="fa-solid fa-star cursor-pointer hover:scale-125 transition" onclick="setRating(3)"></i>
+                        <i class="fa-solid fa-star cursor-pointer hover:scale-125 transition" onclick="setRating(4)"></i>
+                        <i class="fa-solid fa-star cursor-pointer hover:scale-125 transition" onclick="setRating(5)"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <textarea id="feedbackText" rows="3" placeholder="Tulis masukan, kesan, atau pesan Anda..." 
+                        class="w-full bg-galaxy-800 border border-galaxy-600 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-sky-400"></textarea>
+                </div>
+
+                <button onclick="submitFeedback()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl transition">
+                    Kirim Ulasan Mahasiswa
+                </button>
+            </div>
+
+            <div id="feedbackSubmittedMessage" class="hidden text-emerald-400 text-sm font-semibold pt-2">
+                <i class="fa-solid fa-heart mr-1"></i> Ulasan Anda telah terkirim. Terima kasih atas partisipasinya!
+            </div>
+        </section>
+
+    </main>
+
+    <!-- DOSEN MODAL & REKAP PORTAL -->
+    <div id="dosenModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card max-w-4xl w-full rounded-3xl p-6 sm:p-8 max-h-[90vh] flex flex-col space-y-6 border border-indigo-500/30 overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-user-lock"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Portal Pengawasan Dosen</h2>
+                        <p class="text-xs text-gray-400">Sri Anugrah Indriani, S.Pd., M.Pd.</p>
+                    </div>
+                </div>
+                <button onclick="closeDosenModal()" class="text-gray-400 hover:text-white p-2 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Login View -->
+            <div id="dosenLoginView" class="space-y-4 py-8 max-w-md mx-auto w-full text-center">
+                <i class="fa-solid fa-key text-4xl text-sky-400 mb-2"></i>
+                <h3 class="text-xl font-bold text-white">Masukkan Kata Sandi Khusus</h3>
+                <p class="text-xs text-gray-400">Halaman rekap hasil ujian dan log pelanggaran mahasiswa ini hanya dapat diakses oleh Dosen Pengampu.</p>
+                
+                <div class="pt-2">
+                    <input type="password" id="dosenPasswordInput" placeholder="Ketik Kata Sandi Dosen..."
+                        class="w-full bg-galaxy-900 border border-galaxy-600 rounded-xl px-4 py-3 text-center text-white placeholder-gray-500 focus:outline-none focus:border-sky-400 text-sm tracking-widest font-mono">
+                </div>
+
+                <p id="passwordError" class="text-xs text-red-400 hidden font-semibold">Kata sandi salah! Akses ditolak.</p>
+
+                <button onclick="verifyDosenPassword()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold rounded-xl text-sm transition">
+                    Buka Portal Hasil Evaluasi
+                </button>
+            </div>
+
+            <!-- Dashboard View (After Login) -->
+            <div id="dosenDashboardView" class="hidden flex-grow overflow-y-auto space-y-6 pr-2">
+                <div class="flex flex-wrap justify-between items-center gap-3 bg-galaxy-900/80 p-4 rounded-2xl border border-galaxy-700">
+                    <div>
+                        <span class="text-xs text-gray-400">Total Mahasiswa Mengerjakan:</span>
+                        <h4 id="totalSubmissionsCount" class="text-2xl font-extrabold text-sky-400">0</h4>
+                    </div>
+                    <button onclick="clearAllData()" class="px-3 py-1.5 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 text-red-300 text-xs rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash"></i> Hapus Semua Data Evaluasi
+                    </button>
+                </div>
+
+                <!-- Submissions List -->
+                <div id="submissionsContainer" class="space-y-4">
+                    <!-- Dynamic Student Cards inserted via JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Banner -->
+    <footer class="relative z-10 border-t border-indigo-900/40 glass-card py-4 text-center text-xs text-gray-400">
+        <p>&copy; 2026 E-Evaluasi Akhlak Tasawuf. Perancangan Pembelajaran oleh <span class="text-indigo-300 font-medium">Sri Anugrah Indriani, S.Pd., M.Pd.</span></p>
+    </footer>
+
+    <!-- Audio Element for Alarm Siren -->
+    <script>
+        // Web Audio API Synthesizer Siren Sound (No External File Needed)
+        let audioCtx = null;
+        let sirenOscillator = null;
+        let sirenGain = null;
+        let isSirenPlaying = false;
+
+        function startSirenSound() {
+            if (isSirenPlaying) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                sirenOscillator = audioCtx.createOscillator();
+                sirenGain = audioCtx.createGain();
+
+                sirenOscillator.type = 'sawtooth';
+                
+                // Frequency modulation for siren effect
+                let high = false;
+                sirenOscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+
+                sirenGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+                sirenOscillator.connect(sirenGain);
+                sirenGain.connect(audioCtx.destination);
+
+                sirenOscillator.start();
+                isSirenPlaying = true;
+
+                // Alternate tone
+                window.sirenInterval = setInterval(() => {
+                    if (audioCtx && sirenOscillator) {
+                        sirenOscillator.frequency.setValueAtTime(high ? 800 : 400, audioCtx.currentTime);
+                        high = !high;
+                    }
+                }, 300);
+
+            } catch(e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        function stopSirenSound() {
+            if (window.sirenInterval) clearInterval(window.sirenInterval);
+            if (sirenOscillator) {
+                try {
+                    sirenOscillator.stop();
+                    sirenOscillator.disconnect();
+                } catch(e){}
+                sirenOscillator = null;
+            }
+            if (audioCtx) {
+                try { audioCtx.close(); } catch(e){}
+                audioCtx = null;
+            }
+            isSirenPlaying = false;
+        }
+    </script>
+
+    <!-- MAIN APP LOGIC -->
+    <script>
+        // Global States
+        let currentStudentPhoto = null;
+        let mediaStream = null;
+        let examTimer = null;
+        let totalSecondsLeft = 80 * 60; // 1 Hour 20 Minutes = 4800 seconds
+        let violationCount = 0;
+        let isExamActive = false;
+        let selectedRating = 5;
+
+        // Initialize Background Stars Effect
+        function initStars() {
+            const container = document.getElementById('starsContainer');
+            const starCount = 60;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 3 + 1;
+                star.style.position = 'absolute';
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.backgroundColor = '#ffffff';
+                star.style.borderRadius = '50%';
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                star.style.boxShadow = `0 0 ${size * 2}px #38bdf8`;
+                container.appendChild(star);
+            }
+        }
+
+        // Camera Activation
+        async function initCamera() {
+            const video = document.getElementById('webcamVideo');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            const statusText = document.getElementById('cameraStatusText');
+
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+                video.srcObject = mediaStream;
+                placeholder.classList.add('hidden');
+                document.getElementById('btnCapture').disabled = false;
+                document.getElementById('btnCapture').classList.remove('opacity-50', 'cursor-not-allowed');
+                statusText.innerText = "Kamera aktif. Silakan tekan 'Ambil Foto'.";
+                statusText.className = "text-[11px] text-sky-400 font-medium";
+            } catch (err) {
+                alert("Gagal mengakses kamera. Harap izinkan akses kamera di peramban Anda untuk dapat mengikuti ujian.");
+                statusText.innerText = "*Akses kamera ditolak atau tidak ditemukan!";
+                statusText.className = "text-[11px] text-red-400 font-medium";
+            }
+        }
+
+        // Take Photo Snapshot
+        function takeSnapshot() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.getElementById('snapshotCanvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+
+            // Draw video frame to canvas
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            currentStudentPhoto = canvas.toDataURL('image/jpeg', 0.85);
+
+            // UI Feedback
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+
+            const statusText = document.getElementById('cameraStatusText');
+            statusText.innerText = "✓ Foto berhasil diambil!";
+            statusText.className = "text-[11px] text-emerald-400 font-semibold";
+
+            // Enable Start Exam Button
+            const btnStart = document.getElementById('btnStartExam');
+            btnStart.disabled = false;
+            btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Start Exam Handler
+        function handleStartExam(event) {
+            event.preventDefault();
+
+            if (!currentStudentPhoto) {
+                alert("Harap ambil foto verifikasi wajah terlebih dahulu!");
+                return;
+            }
+
+            const nama = document.getElementById('inputNama').value.trim();
+            const nim = document.getElementById('inputNIM').value.trim();
+            const prodi = document.getElementById('inputProdi').value.trim();
+
+            if (!nama || !nim || !prodi) {
+                alert("Mohon lengkapi seluruh data diri Anda.");
+                return;
+            }
+
+            // Populate Student Details in Exam Section Header
+            document.getElementById('examStudentName').innerText = nama;
+            document.getElementById('examStudentNIM').innerText = nim;
+            document.getElementById('examStudentProdi').innerText = prodi;
+            document.getElementById('examStudentPhoto').src = currentStudentPhoto;
+
+            // Stop Camera Stream to save performance
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+
+            // Transition UI
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('examSection').classList.remove('hidden');
+            document.getElementById('headerTimer').classList.remove('hidden');
+            document.getElementById('headerTimer').classList.add('flex');
+
+            // Set Active Flag & Start Timer & Anti-Cheat Monitor
+            isExamActive = true;
+            startTimer();
+            setupAntiCheat();
+            
+            // Request Fullscreen
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                }
+            } catch(e) {}
+        }
+
+        // Countdown Timer
+        function startTimer() {
+            updateTimerDisplay();
+            examTimer = setInterval(() => {
+                totalSecondsLeft--;
+                updateTimerDisplay();
+
+                if (totalSecondsLeft <= 0) {
+                    clearInterval(examTimer);
+                    alert("Waktu ujian telah habis! Jawaban Anda akan otomatis dikirim.");
+                    document.getElementById('examForm').requestSubmit();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(totalSecondsLeft / 3600);
+            const minutes = Math.floor((totalSecondsLeft % 3600) / 60);
+            const seconds = totalSecondsLeft % 60;
+
+            const pad = (num) => String(num).padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        // Anti-Cheating System (Visibility Change & Window Blur Detection)
+        function setupAntiCheat() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && isExamActive) {
+                    triggerCheatViolation();
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                if (isExamActive) {
+                    triggerCheatViolation();
+                }
+            });
+        }
+
+        function triggerCheatViolation() {
+            violationCount++;
+            document.getElementById('violationCountDisplay').innerText = violationCount;
+            document.getElementById('violationOverlay').classList.remove('hidden');
+            document.body.classList.add('siren-active');
+            startSirenSound();
+        }
+
+        function dismissViolationWarning() {
+            document.getElementById('violationOverlay').classList.add('hidden');
+            document.body.classList.remove('siren-active');
+            stopSirenSound();
+        }
+
+        // Finish Exam Handler
+        function handleFinishExam(event) {
+            event.preventDefault();
+
+            isExamActive = false;
+            clearInterval(examTimer);
+
+            const submissionData = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('id-ID'),
+                nama: document.getElementById('inputNama').value.trim(),
+                nim: document.getElementById('inputNIM').value.trim(),
+                prodi: document.getElementById('inputProdi').value.trim(),
+                photo: currentStudentPhoto,
+                violations: violationCount,
+                answers: {
+                    q1: document.getElementById('q1').value,
+                    q2: document.getElementById('q2').value,
+                    q3: document.getElementById('q3').value,
+                    q4: document.getElementById('q4').value,
+                    q5: document.getElementById('q5').value,
+                },
+                feedback: "",
+                rating: 5
+            };
+
+            // Save to LocalStorage
+            saveSubmission(submissionData);
+            window.currentSubmissionId = submissionData.id;
+
+            // UI Transition
+            document.getElementById('examSection').classList.add('hidden');
+            document.getElementById('headerTimer').classList.add('hidden');
+            document.getElementById('thankyouSection').classList.remove('hidden');
+
+            // Exit Fullscreen if active
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(e => {});
+            }
+        }
+
+        // Rating & Feedback Logic
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.getElementById('starRatingContainer').children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].className = "fa-solid fa-star cursor-pointer hover:scale-125 transition text-amber-400";
+                } else {
+                    stars[i].className = "fa-regular fa-star cursor-pointer hover:scale-125 transition text-gray-600";
+                }
+            }
+        }
+
+        function submitFeedback() {
+            const feedbackText = document.getElementById('feedbackText').value.trim();
+            const submissions = getSubmissions();
+            
+            const index = submissions.findIndex(s => s.id === window.currentSubmissionId);
+            if (index !== -1) {
+                submissions[index].feedback = feedbackText;
+                submissions[index].rating = selectedRating;
+                localStorage.setItem('akhlak_tasawuf_evals', JSON.stringify(submissions));
+            }
+
+            document.getElementById('feedbackBox').classList.add('hidden');
+            document.getElementById('feedbackSubmittedMessage').classList.remove('hidden');
+        }
+
+        // Local Storage Helpers
+        function getSubmissions() {
+            const data = localStorage.getItem('akhlak_tasawuf_evals');
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveSubmission(submission) {
+            const submissions = getSubmissions();
+            submissions.unshift(submission);
+            localStorage.setItem('akhlak_tasawuf_evals', JSON.stringify(submissions));
+        }
+
+        // DOSEN PORTAL MODAL LOGIC
+        function openDosenLoginModal() {
+            document.getElementById('dosenModal').classList.remove('hidden');
+        }
+
+        function closeDosenModal() {
+            document.getElementById('dosenModal').classList.add('hidden');
+        }
+
+        function verifyDosenPassword() {
+            const pass = document.getElementById('dosenPasswordInput').value;
+            const errorMsg = document.getElementById('passwordError');
+
+            if (pass === "UDAH SIAP BELOM") {
+                errorMsg.classList.add('hidden');
+                document.getElementById('dosenLoginView').classList.add('hidden');
+                document.getElementById('dosenDashboardView').classList.remove('hidden');
+                renderDosenDashboard();
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function renderDosenDashboard() {
+            const submissions = getSubmissions();
+            const container = document.getElementById('submissionsContainer');
+            document.getElementById('totalSubmissionsCount').innerText = submissions.length;
+
+            if (submissions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500 text-sm">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2 text-galaxy-600"></i>
+                        <p>Belum ada mahasiswa yang mengumpulkan hasil ujian.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = submissions.map((sub, idx) => `
+                <div class="bg-galaxy-900 border border-galaxy-700 rounded-2xl p-5 space-y-4">
+                    <div class="flex flex-wrap items-start justify-between gap-4 border-b border-gray-800 pb-4">
+                        <div class="flex items-center gap-4">
+                            <img src="${sub.photo}" alt="Foto ${sub.nama}" class="w-16 h-16 rounded-xl object-cover border border-sky-400">
+                            <div>
+                                <h4 class="font-bold text-base text-white">${sub.nama}</h4>
+                                <p class="text-xs text-indigo-300">NIM: <span class="font-mono text-sky-300">${sub.nim}</span> | Prodi: ${sub.prodi}</p>
+                                <p class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${sub.timestamp}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${sub.violations > 0 ? 'bg-red-950 text-red-400 border border-red-500/30' : 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'}">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> ${sub.violations} Pelanggaran
+                            </span>
+                            ${sub.rating ? `<span class="text-xs text-amber-400"><i class="fa-solid fa-star"></i> ${sub.rating}/5 Ulasan</span>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Answers Accordion/Details -->
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-galaxy-800/60 p-3 rounded-xl border border-gray-800">
+                            <p class="font-semibold text-sky-300 mb-1">1. Definisi AKHLAK, TASAWUF & AKHLAK TASAWUF:</p>
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(sub.answers.q1)}</p>
+                        </div>
+                        <div class="bg-galaxy-800/60 p-3 rounded-xl border border-gray-800">
+                            <p class="font-semibold text-sky-300 mb-1">2. 3 Proses Tazkiyatun Nafs:</p>
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(sub.answers.q2)}</p>
+                        </div>
+                        <div class="bg-galaxy-800/60 p-3 rounded-xl border border-gray-800">
+                            <p class="font-semibold text-sky-300 mb-1">3. Pertumbuhan Akhlak Tasawuf Masa Rasulullah SAW:</p>
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(sub.answers.q3)}</p>
+                        </div>
+                        <div class="bg-galaxy-800/60 p-3 rounded-xl border border-gray-800">
+                            <p class="font-semibold text-sky-300 mb-1">4. Relevansi Bagi Gen Z di Era Modern:</p>
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(sub.answers.q4)}</p>
+                        </div>
+                        <div class="bg-galaxy-800/60 p-3 rounded-xl border border-gray-800">
+                            <p class="font-semibold text-sky-300 mb-1">5. Hubungan Akhlak Tasawuf dengan Ilmu Keislaman:</p>
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(sub.answers.q5)}</p>
+                        </div>
+
+                        ${sub.feedback ? `
+                        <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/40">
+                            <p class="font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-comment mr-1"></i> Ulasan Mahasiswa:</p>
+                            <p class="text-gray-300 italic">"${escapeHtml(sub.feedback)}"</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearAllData() {
+            if (confirm("Apakah Ibu Sri Anugrah Indriani yakin ingin menghapus seluruh rekapan hasil ujian mahasiswa?")) {
+                localStorage.removeItem('akhlak_tasawuf_evals');
+                renderDosenDashboard();
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '-';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // On Page Load
+        window.onload = function() {
+            initStars();
+        };
+    </script>
+</body>
+</html>
